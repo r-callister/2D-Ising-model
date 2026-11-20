@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from ising import simulate, calculate_averages, J
 
-SIZES = [8, 16, 32]
+SIZES = [8, 16, 32, 64]
 # Coarse steps far from the transition, fine steps of 0.05 around it
 TEMPERATURES = np.round(np.concatenate([np.linspace(1.0, 1.75, 4),
                                         np.linspace(2.0, 2.75, 16),
@@ -23,7 +23,7 @@ N_EQUILIBRATION = 500
 N_MEASUREMENTS = 6000
 SEED = 1
 T_CRITICAL = 2 * J / np.log(1 + np.sqrt(2))      # Onsager's exact critical temperature
-COLOURS = ["#2a78d6", "#eb6834", "#e34948"]      # one colour per lattice size
+COLOURS = ["#2a78d6", "#eb6834", "#e34948", "#2a9d55"]      # one colour per lattice size
 
 
 def exact_magnetisation(temperatures):
