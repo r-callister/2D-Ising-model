@@ -2,7 +2,7 @@
 
 A Monte Carlo simulation of the 2D Ising model on a square lattice. It shows a ferromagnet losing its magnetisation at the critical temperature, and how the results for a finite lattice approach Onsager’s exact solution for an infinite lattice as the lattice gets larger.
 
-![Magnetisation and susceptibility against temperature for three lattice sizes](figures/ising_scan.png)
+![Magnetisation and susceptibility against temperature for four lattice sizes](figures/ising_scan.png)
 
 ## Why this model
 
@@ -20,8 +20,7 @@ $$
 E = -J \sum_{\langle i,j \rangle} s_i s_j ,
 $$
 
-where the sum is over nearest-neighbour pairs and $J > 0$, so aligned neighbours have lower
-energy. The code uses units with $J = k_B = 1$.
+where the sum is over nearest-neighbour pairs and $J > 0$, so aligned neighbours have lower energy. The code uses units with $J = k_B = 1$.
 
 Onsager's exact critical temperature for an infinite lattice is
 
@@ -29,47 +28,29 @@ $$
 T_c = \frac{2J}{k_B \ln\left(1 + \sqrt{2}\right)} \approx 2.269 ,
 $$
 
-and below $T_c$ the exact magnetisation per spin (announced by Onsager, proved by Yang in
-1952) is
+and below $T_c$ the exact magnetisation per spin (announced by Onsager, proved by Yang in 1952) is
 
 $$
 M = \left[ 1 - \sinh^{-4}\left(\frac{2J}{k_B T}\right) \right]^{1/8} ,
 $$
 
-which falls to zero at $T_c$. The susceptibility $\chi$ measures how much the magnetisation
-fluctuates. For an infinite lattice it diverges at $T_c$, and on a finite lattice it shows a
-peak instead.
+which falls to zero at $T_c$. The susceptibility $\chi$ measures how much the magnetisation fluctuates. For an infinite lattice it diverges at $T_c$, and on a finite lattice it shows a peak instead.
 
 ## Method
 
-- **Metropolis algorithm.** A spin is picked at random and flipped if the flip lowers the
-  energy, or otherwise with probability $e^{-\Delta E / k_B T}$. One sweep is $N$ attempted
-  flips, where $N = L^2$ is the number of spins.
-- **Periodic boundaries.** The lattice wraps around like the surface of a torus, so every
-  spin has four neighbours.
-- **Equilibration.** The first sweeps are discarded while the lattice settles. The scan
-  starts every run with all spins aligned, which avoids long-lived stripe states that random
+- **Metropolis algorithm.** A spin is picked at random and flipped if the flip lowers the energy, or otherwise with probability $e^{-\Delta E / k_B T}$. One sweep is $N$ attempted flips, where $N = L^2$ is the number of spins.
+- **Periodic boundaries.** The lattice wraps around like the surface of a torus, so every spin has four neighbours.
+- **Equilibration.** The first sweeps are discarded while the lattice settles. The scan starts every run with all spins aligned, which avoids long-lived stripe states that random
   starts can get stuck in below $T_c$.
-- **Error bars.** Consecutive sweeps are correlated, so they cannot be treated as independent
-  samples. The measurement sweeps are split into 10 blocks and the errors come from a
-  blocked jackknife, which also works for the susceptibility (a variance, not a mean).
-- **Drift check.** If the averages in the first and second halves of the measurement sweeps
-  differ by more than 3 standard errors, the run is flagged as not yet in equilibrium.
-- **Observables.** Energy per spin, $\langle |m| \rangle$, and
-  $\chi = N\left(\langle m^2 \rangle - \langle |m| \rangle^2\right) / k_B T$.
-  On a finite lattice the signed $\langle m \rangle$ averages to zero, because the whole
-  lattice occasionally flips between mostly up and mostly down, so $|m|$ is used instead.
+- **Error bars.** Consecutive sweeps are correlated, so they cannot be treated as independent samples. The measurement sweeps are split into 10 blocks and the errors come from a blocked jackknife, which also works for the susceptibility (a variance, not a mean).
+- **Drift check.** If the averages in the first and second halves of the measurement sweeps differ by more than 3 standard errors, the run is flagged as not yet in equilibrium.
+- **Observables.** Energy per spin, $\langle |m| \rangle$, and $\chi = N\left(\langle m^2 \rangle - \langle |m| \rangle^2\right) / k_B T$. On a finite lattice the signed $\langle m \rangle$ averages to zero, because the whole lattice occasionally flips between mostly up and mostly down, so $|m|$ is used instead.
 
 ## Results
 
-**Below $T_c$ the simulation matches Onsager's exact result.** Nothing is fitted. At
-$T = 2.0$ all three lattice sizes give $\langle |m| \rangle = 0.913$–$0.915$, against the
-exact $0.911$.
+**Below $T_c$ the simulation matches Onsager's exact result.** Nothing is fitted. At $T = 2.0$ all four lattice sizes give $\langle |m| \rangle = 0.911$–$0.915$, against the exact $0.911$.
 
-**Above $T_c$ the magnetisation goes to zero as the lattice grows.** A finite lattice keeps a
-small leftover magnetisation even when it is disordered. Far above $T_c$, spins are only
-correlated over short distances, so the lattice behaves like many independent patches. The
-sum of $N$ random $\pm 1$ contributions grows like $\sqrt{N}$, so $|m| \propto 1/\sqrt{N} = 1/L$.
+**Above $T_c$ the magnetisation goes to zero as the lattice grows.** A finite lattice keeps a small leftover magnetisation even when it is disordered. Far above $T_c$, spins are only correlated over short distances, so the lattice behaves like many independent patches. The sum of $N$ random $\pm 1$ contributions grows like $\sqrt{N}$, so $|m| \propto 1/\sqrt{N} = 1/L$.
 The data follow this closely:
 
 | $L$ | $\langle \lvert m \rvert \rangle$ at $T = 4.0$ |
@@ -77,55 +58,38 @@ The data follow this closely:
 | 8 | 0.211 |
 | 16 | 0.104 |
 | 32 | 0.052 |
+| 64 | 0.026 |
 
 Each doubling of $L$ halves $|m|$. For an infinite lattice the leftover magnetisation
 vanishes and the sharp transition at $T_c$ is recovered.
 
-**The susceptibility peak grows and moves towards $T_c$ as $L$ increases.** For an infinite
-lattice $\chi$ diverges at $T_c$. On a finite lattice the correlation length cannot grow
-beyond $L$, so the divergence is cut off and becomes a peak. Finite-size scaling predicts a
-peak height $\chi_{\max} \propto L^{\gamma/\nu} = L^{7/4}$, using the exact 2D exponents
-$\gamma = 7/4$ and $\nu = 1$. So doubling $L$ should multiply the peak by
-$2^{7/4} \approx 3.36$.
+**The susceptibility peak grows and moves towards $T_c$ as $L$ increases.** For an infinite lattice $\chi$ diverges at $T_c$. On a finite lattice the correlation length cannot grow beyond $L$, so the divergence is cut off and becomes a peak. Finite-size scaling predicts a peak height $\chi_{\max} \propto L^{\gamma/\nu} = L^{7/4}$, using the exact 2D exponents $\gamma = 7/4$ and $\nu = 1$. So doubling $L$ should multiply the peak by $2^{7/4} \approx 3.36$.
 
 | $L$ | Peak $\chi$ | Peak position |
 |---|---|---|
-| 8 | 1.75 ± 0.04 | broad, about 2.5–2.6 |
-| 16 | 6.5 ± 0.9 | 2.35–2.4 |
-| 32 | about 16–25 | 2.25–2.4 (within errors) |
+| 8 | 1.75 ± 0.04 | 2.60 |
+| 16 | 6.5 ± 0.9 | 2.35 |
+| 32 | 25 ± 6 | 2.25 |
+| 64 | 55 ± 27 | 2.30 |
 
-From $L = 8$ to $16$ the peak grows by $3.7 \pm 0.5$, consistent with $3.36$. The $L = 32$
-points near $T_c$ are too noisy to give a clean ratio (see Limitations): the four points
-from 2.25 to 2.4 are consistent within their error bars, so the highest one, at 2.25, does not pin
-down the peak position. The peak position is also predicted to shift towards $T_c$ as
-$L^{-1/\nu} = 1/L$, and the data move that way, from a broad maximum near 2.5–2.6 for
-$L = 8$ to close to $T_c$ for $L = 32$.
+Peak positions are the highest point on a grid with a spacing of 0.05, so they are only accurate to about ±0.05. The $L = 8$ peak is broad, with nearly equal values from 2.5 to 2.7.
 
-**Random starts can get stuck in stripe states.** The most surprising thing I found was that if the simulation is started from random spins below $T_c$, the lattice can settle into two bands, one of up spins and one of down spins, separated by two straight domain walls that wrap all the way round the lattice. In one run at $L = 32$ and $T = 1.5$ this lasted over 2000 sweeps. The walls are long-lived because their energy depends only on their length: moving a straight wall sideways doesn’t make it shorter, so there is no energy to gain and nothing drives the two walls together. They only drift through thermal fluctuations until they meet and annihilate. At zero temperature this never happens, and a random start ends up permanently stuck in stripes about a third of the time. This is why the scan starts every run with all spins aligned.
+From $L = 8$ to $16$ the peak grows by $3.7 \pm 0.5$, consistent with the predicted $3.36$. For $L = 64$ the prediction from $L = 16$ is $6.5 \times 4^{7/4} \approx 74$, and the measured $55 \pm 27$ agrees within its error. The $L = 32$ and $L = 64$ peaks have large errors because of critical slowing down (see Limitations), so they confirm the trend rather than test the exponent precisely. For the same reason, the $L = 32$ peak landing at 2.25, just below $T_c$, is within the noise. Overall the peak moves towards $T_c$ as $L$ grows, as the predicted $L^{-1/\nu} = 1/L$ shift implies.
+
+**Random starts can get stuck in stripe states.** The most surprising thing I found was that if the simulation is started from random spins below $T_c$, the lattice can settle into two bands, one of up spins and one of down spins, separated by two straight domain walls that wrap all the way round the lattice. In one run at $L = 32$ and $T = 1.5$ this lasted over 2000 sweeps. The walls are long-lived because their energy depends only on their length: moving a straight wall sideways doesn’t make it shorter, so there is no energy to gain and nothing drives the two walls together. They only drift through thermal fluctuations until they meet and annihilate. At zero temperature this never happens, and a random start ends up permanently stuck in stripes about a third of the time (Spirin et al., 2001). This is why the scan starts every run with all spins aligned.
 
 ## A single run
 
 ![Lattice snapshots and the energy and magnetisation during one run](figures/ising_run.png)
 
-An $L = 64$ lattice at $T = 2.4$, just above $T_c$, starting from random spins (orange is
-−1, blue is +1). Within a few hundred sweeps the spins form clusters of many different sizes.
-That is the large correlation length near a critical point. The lattice has no overall
-magnetisation, but at any moment it can be noticeably more one colour than the other.
+An $L = 64$ lattice at $T = 2.4$, just above $T_c$, starting from random spins (orange is −1, blue is +1). Within a few hundred sweeps the spins form clusters of many different sizes. That is the large correlation length near a critical point. The lattice has no overall magnetisation, but at any moment it can be noticeably more one colour than the other.
 
 ## Limitations
 
-- **Critical slowing down.** Near $T_c$ the Metropolis algorithm takes a long time to
-  produce independent configurations. The correlation time grows roughly as $L^{z}$ with
-  $z \approx 2.17$. For $L = 32$ near $T_c$ it reaches hundreds of sweeps, so those points
-  are the noisiest in the figure, and running the same temperature with a different seed
-  moves the peak height by about 15%. The drift check catches the worst cases: at $L = 64$ and $T = 2.3$, 1000 equilibration sweeps were not enough. Cluster algorithms such as Wolff's flip whole clusters at once and avoid most of this slowing down.
-- **False alarms from the drift check.** The check is a 3-standard-error test on only 5
-  blocks per half, so a few percent of perfectly good runs are flagged by chance. In the
-  figure above it flagged $L = 32$ at $T = 4.0$, where the correlation time is only a few
-  sweeps, so that warning is a false alarm.
-- **Speed.** The Metropolis loop is plain Python, so the full scan takes about 15 minutes.
-- **Lattice sizes.** With only three sizes and a temperature step of 0.05, the peak positions
-  give a rough check of finite-size scaling rather than a precise fit.
+- **Critical slowing down.** Near $T_c$ the Metropolis algorithm takes a long time to produce independent configurations. The correlation time grows roughly as $L^{z}$ with $z \approx 2.17$. For $L = 32$ near $T_c$ it reaches hundreds of sweeps, and for $L = 64$ several times more, so those points are the noisiest in the figure. Running $L = 32$ with a different seed moves its peak height by about 15%. The drift check catches the worst cases: at $L = 64$ and $T = 2.3$, 1000 equilibration sweeps were not enough and in the scan it also flagged $L = 64$ at $T = 2.2$, just below $T_c$. Cluster algorithms such as Wolff's flip whole clusters at once and avoid most of this slowing down.
+- **False alarms from the drift check.** The check is a 3-standard-error test on only 5 blocks per half, so a few percent of perfectly good runs are flagged by chance. In the figure above it flagged $L = 32$ at $T = 4.0$ and $L = 64$ at $T = 3.75$, where the correlation time is only a few sweeps, so that warning are false alarms.
+- **Speed.** The Metropolis loop is plain Python, so the full scan takes about 35 minutes.
+- **Lattice sizes.** With only four sizes and a temperature step of 0.05, the peak positions give a rough check of finite-size scaling rather than a precise fit.
 
 ## Running it
 
@@ -135,7 +99,7 @@ Needs Python 3 with NumPy and Matplotlib (tested with Python 3.13).
 pip install -r requirements.txt
 
 python ising.py         # one run: asks for lattice size, temperature and sweeps
-python ising_scan.py    # temperature scan for L = 8, 16, 32 (about 15 minutes)
+python ising_scan.py    # temperature scan for L = 8, 16, 32, 64 (about 35 minutes)
 pytest                  # run the tests
 ```
 
